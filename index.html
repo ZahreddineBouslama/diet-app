@@ -1,445 +1,559 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Bernstein Coach</title>
-<meta name="theme-color" content="#2563eb" />
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icons/icon-192.png">
-
-<style>
-  body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;margin:0;background:#f4f7fb;color:#0f172a}
-  header{background:#fff;padding:1rem;box-shadow:0 1px 4px rgba(0,0,0,.08)}
-  main{padding:1rem;max-width:880px;margin:auto;padding-bottom:2rem}
-  .card{background:#fff;border-radius:16px;padding:1rem;margin-bottom:1rem;box-shadow:0 2px 6px rgba(0,0,0,.06)}
-  h1{font-size:1.25rem;margin:.1rem 0}
-  h2{margin:.2rem 0 .6rem;font-size:1.05rem}
-  .muted{color:#64748b;font-size:.88rem;line-height:1.35}
-  .row{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
-  .kpi{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.8rem;margin-top:.8rem}
-  .kpi>div{background:#f8fafc;border:1px solid #e5e7eb;border-radius:16px;padding:.85rem}
-  .big{font-size:1.45rem;font-weight:950}
-  .mono{font-variant-numeric:tabular-nums}
-  label{display:block;font-weight:900;margin-top:.6rem}
-  input, select{width:100%;padding:.62rem;border:1px solid #cbd5e1;border-radius:14px;margin-top:.35rem;font-size:1rem;background:#fff}
-  button{border:none;border-radius:999px;font-weight:900;cursor:pointer}
-  .primary{background:#2563eb;color:#fff;padding:.8rem 1rem}
-  .secondary{background:#e5e7eb;color:#0f172a;padding:.7rem 1rem}
-  .ghost{background:transparent;border:1px solid #cbd5e1;color:#0f172a;padding:.65rem 1rem}
-  .hr{height:1px;background:#e5e7eb;margin:1rem 0}
-  .line{display:flex;align-items:center;justify-content:space-between;gap:.8rem;border:1px solid #e5e7eb;border-radius:14px;padding:.65rem .75rem;margin:.45rem 0;background:#fff}
-  .name{font-weight:900}
-  .sub{color:#64748b;font-size:.82rem;margin-top:.1rem}
-  .ctrl{display:flex;align-items:center;gap:.4rem}
-  .pillbtn{width:34px;height:34px;border-radius:999px;border:1px solid #cbd5e1;background:#fff;font-weight:950}
-  .count{min-width:28px;text-align:center;font-weight:950}
-  .warn{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:14px;padding:.7rem;margin-top:.8rem}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0b0f14" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <title>Bernstein Coach PWA v7</title>
+  <style>
+    :root {
+      --bg:#0b0f14; --card:#121a23; --muted:#93a4b5; --text:#e8eef5; --accent:#4dd4ac; --warn:#ffcc66; --danger:#ff6b6b;
+      --border: rgba(255,255,255,.08);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; background:var(--bg); color:var(--text);}
+    header{position:sticky; top:0; z-index:10; background:rgba(11,15,20,.92); backdrop-filter: blur(10px); border-bottom:1px solid var(--border);}
+    .wrap{max-width:980px;margin:0 auto;padding:14px 14px 80px;}
+    .row{display:flex; gap:10px; flex-wrap:wrap;}
+    h2{font-size:14px;margin:14px 0 8px;color:var(--muted); font-weight:600;}
+    .tabs{display:flex; gap:8px; padding:10px 14px; overflow:auto;}
+    .tab{padding:10px 12px; border:1px solid var(--border); border-radius:999px; color:var(--muted); cursor:pointer; user-select:none; white-space:nowrap;}
+    .tab.active{color:var(--bg); background:var(--accent); border-color:transparent; font-weight:700;}
+    .card{background:var(--card); border:1px solid var(--border); border-radius:16px; padding:12px;}
+    .grid{display:grid; grid-template-columns: 1fr; gap:10px;}
+    @media (min-width:860px){ .grid{grid-template-columns: 1.2fr .8fr;} }
+    label{display:block; font-size:12px; color:var(--muted); margin-bottom:6px;}
+    input, select{width:100%; padding:10px 12px; border-radius:12px; border:1px solid var(--border); background:#0f1520; color:var(--text);}
+    .btn{padding:10px 12px; border-radius:12px; border:1px solid var(--border); background:#0f1520; color:var(--text); cursor:pointer;}
+    .btn.primary{background:var(--accent); border-color:transparent; color:var(--bg); font-weight:800;}
+    .btn.warn{background:var(--warn); border-color:transparent; color:var(--bg); font-weight:800;}
+    .btn.danger{background:var(--danger); border-color:transparent; color:var(--bg); font-weight:900;}
+    .pill{display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; border:1px solid var(--border); color:var(--muted); font-size:12px;}
+    .pill.warn{border-color: rgba(255,204,102,.35); color: var(--warn);}
+    .pill.danger{border-color: rgba(255,107,107,.35); color: var(--danger);}
+    .muted{color:var(--muted);}
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;}
+    .hr{height:1px;background:var(--border);margin:10px 0;}
+    .foodrow{display:flex; justify-content:space-between; gap:10px; align-items:center; padding:10px 0; border-bottom:1px solid var(--border);}
+    .foodrow:last-child{border-bottom:none;}
+    .small{font-size:12px;}
+    .right{text-align:right;}
+    .seg{display:flex; gap:8px; flex-wrap:wrap;}
+    .seg .btn{border-radius:999px; padding:8px 10px;}
+    .kpi{display:flex; justify-content:space-between; gap:10px; align-items:baseline;}
+    .kpi .val{font-size:22px; font-weight:900;}
+    .kbd{padding:2px 6px;border:1px solid var(--border); border-radius:8px; font-size:12px; color:var(--muted);}
+    .toast{position:fixed; left:50%; transform:translateX(-50%); bottom:18px; background:#0f1520; border:1px solid var(--border); padding:10px 12px; border-radius:12px; color:var(--text); max-width:92vw; display:none;}
+  </style>
 </head>
 <body>
-
 <header>
-  <h1>Bernstein Coach v6</h1>
-  <div class="muted">Wasa = 5g per cracker • counters (+/−) • 25+ templates • BG target 100 mg/dL</div>
+  <div class="tabs" id="tabs"></div>
 </header>
 
-<main>
-
-<div class="card">
-  <h2>Templates (25+)</h2>
-  <div class="row">
-    <div>
-      <label>Choose template</label>
-      <select id="tpl"></select>
-    </div>
-    <div style="display:flex;align-items:end;gap:.6rem">
-      <button class="primary" style="width:100%" onclick="applyTemplate()">Load</button>
-      <button class="ghost" style="width:100%" onclick="resetAll()">Reset</button>
-    </div>
-  </div>
-  <div class="muted" style="margin-top:.5rem">
-    Templates set typical portions. If you use a different brand/recipe, adjust counts or use label grams.
-  </div>
+<div class="wrap">
+  <div id="view"></div>
 </div>
 
-<div class="card">
-  <h2>Carbs (counters)</h2>
-  <div id="carbList"></div>
-  <div class="hr"></div>
-  <div class="muted">Carb total</div>
-  <div class="big mono" id="carbTotal">0.0 g</div>
-</div>
-
-<div class="card">
-  <h2>Protein (deck-of-cards method)</h2>
-  <div id="protList"></div>
-  <div class="hr"></div>
-  <div class="muted">Protein food total</div>
-  <div class="big mono"><span id="proteinOz">0.0</span> oz</div>
-  <div class="muted" style="margin-top:.4rem">
-    Protein dose uses: <span class="mono">ounces ÷ 1.5</span> (Regular insulin).
-  </div>
-</div>
-
-<div class="card">
-  <h2>Blood glucose (correction)</h2>
-  <div class="row">
-    <div>
-      <label>Current BG (mg/dL)</label>
-      <input id="bgNow" type="number" value="100" inputmode="numeric">
-      <div class="muted" style="margin-top:.35rem">≈ <span class="mono" id="bgNowMmol">5.6</span> mmol/L</div>
-    </div>
-    <div>
-      <label>Target BG (mg/dL)</label>
-      <input id="bgTarget" type="number" value="100" inputmode="numeric">
-      <div class="muted" style="margin-top:.35rem">≈ <span class="mono" id="bgTargetMmol">5.6</span> mmol/L</div>
-    </div>
-  </div>
-  <div class="row" style="margin-top:.6rem">
-    <div>
-      <label>Correction factor (mg/dL per 1U R)</label>
-      <input id="corrFactor" type="number" value="40" inputmode="numeric">
-      <div class="muted" style="margin-top:.35rem">Example default. Individualize with clinician.</div>
-    </div>
-    <div>
-      <label>Correction</label>
-      <div class="big mono" id="corrU">0.00 U</div>
-    </div>
-  </div>
-</div>
-
-<div class="card">
-  <h2>Insulin result</h2>
-  <div class="kpi">
-    <div>
-      <div class="muted">Meal R</div>
-      <div class="big mono" id="mealU">0.00 U</div>
-    </div>
-    <div>
-      <div class="muted">Total R</div>
-      <div class="big mono" id="totalU">0.00 U</div>
-    </div>
-    <div>
-      <div class="muted">Rounding</div>
-      <select id="roundStep">
-        <option value="0.5" selected>0.5U</option>
-        <option value="1">1.0U</option>
-        <option value="0.25">0.25U</option>
-      </select>
-    </div>
-  </div>
-
-  <button class="primary" style="width:100%;margin-top:.9rem" onclick="calc()">Calculate</button>
-  <button class="secondary" style="width:100%;margin-top:.6rem" onclick="saveSnapshot()">Save as “Last meal”</button>
-
-  <div id="msg"></div>
-</div>
-
-<div class="card">
-  <h2>Advanced (label grams)</h2>
-  <div class="muted">
-    Optional: add grams from nutrition labels (useful for sauces, dairy, special brands).
-  </div>
-  <div class="row" style="margin-top:.6rem">
-    <div>
-      <label>Add carbs (g)</label>
-      <input id="advCarbG" type="number" step="0.1" value="0" inputmode="decimal">
-    </div>
-    <div>
-      <label>Add protein (g)</label>
-      <input id="advProtG" type="number" step="0.1" value="0" inputmode="decimal">
-    </div>
-  </div>
-  <div class="row" style="margin-top:.6rem">
-    <button class="secondary" onclick="applyAdvanced()">Add grams</button>
-    <button class="ghost" onclick="resetAdvanced()">Reset grams</button>
-  </div>
-  <div class="muted" style="margin-top:.5rem">
-    Protein grams → ounces of “protein food” uses: <span class="mono">protein_g ÷ 6</span>.
-  </div>
-</div>
-
-<div class="warn muted">
-  <b>Safety:</b> This tool is educational. If you have frequent lows/highs, do not adjust insulin alone—contact your clinician.
-</div>
-
-</main>
+<div class="toast" id="toast"></div>
 
 <script>
-/* ---------- Data ---------- */
-const CARB_ITEMS = [
-  {id:"wasa", name:"Wasa / crispbread", unit:"cracker", grams:5.0},
-  {id:"salad", name:"Leafy salad", unit:"cup", grams:4.0},
-  {id:"broc", name:"Broccoli (cooked)", unit:"½ cup", grams:6.0},
-  {id:"caul", name:"Cauliflower (cooked)", unit:"½ cup", grams:5.0},
-  {id:"zuch", name:"Zucchini (cooked)", unit:"½ cup", grams:4.0},
-  {id:"beans", name:"Green beans (cooked)", unit:"½ cup", grams:7.0},
-  {id:"tom", name:"Tomato", unit:"small", grams:3.0},
-  {id:"cuke", name:"Cucumber", unit:"cup", grams:1.0}
-];
+const V7 = {
+  version: "7.0.0",
+  foods: [{"id": "avocado_raw", "name": "Avocado (raw)", "category": "Safe Foods", "unit": "g", "net_carbs_per_100g": 2.0, "total_carbs_per_100g": 9.0, "fiber_per_100g": 7.0, "presets": [50, 100, 150], "notes": "Net carbs shown. Very low glycemic impact."}, {"id": "macadamia", "name": "Macadamia nuts", "category": "Nuts & Seeds", "unit": "g", "net_carbs_per_100g": 5.0, "presets": [10, 20, 30, 40], "notes": "Net carbs shown."}, {"id": "pecans", "name": "Pecans", "category": "Nuts & Seeds", "unit": "g", "net_carbs_per_100g": 4.0, "presets": [10, 20, 30, 40], "notes": "Net carbs shown."}, {"id": "brazil_nuts", "name": "Brazil nuts", "category": "Nuts & Seeds", "unit": "g", "net_carbs_per_100g": 4.0, "presets": [10, 20, 30, 40], "notes": "Net carbs shown."}, {"id": "walnuts", "name": "Walnuts", "category": "Nuts & Seeds", "unit": "g", "net_carbs_per_100g": 7.0, "presets": [10, 20, 30, 40], "notes": "Net carbs shown."}, {"id": "almonds", "name": "Almonds", "category": "Nuts & Seeds", "unit": "g", "net_carbs_per_100g": 10.0, "presets": [10, 20, 30, 40], "notes": "Net carbs shown."}, {"id": "hazelnuts", "name": "Hazelnuts", "category": "Nuts & Seeds", "unit": "g", "net_carbs_per_100g": 7.0, "presets": [10, 20, 30, 40], "notes": "Net carbs shown."}, {"id": "pine_nuts", "name": "Pine nuts", "category": "Nuts & Seeds", "unit": "g", "net_carbs_per_100g": 13.0, "presets": [10, 20, 30, 40], "notes": "Net carbs shown."}, {"id": "peanuts", "name": "Peanuts (legume)", "category": "Nuts & Seeds", "unit": "g", "net_carbs_per_100g": 8.0, "presets": [10, 20, 30, 40], "notes": "Net carbs shown."}, {"id": "cashews", "name": "Cashews", "category": "Nuts & Seeds", "unit": "g", "net_carbs_per_100g": 22.0, "presets": [10, 20, 30], "warning": true, "notes": "Higher net carbs. Portion carefully."}, {"id": "pistachios", "name": "Pistachios", "category": "Nuts & Seeds", "unit": "g", "net_carbs_per_100g": 18.0, "presets": [10, 20, 30], "warning": true, "notes": "Higher net carbs. Portion carefully."}, {"id": "chestnuts", "name": "Chestnuts", "category": "Nuts & Seeds", "unit": "g", "net_carbs_per_100g": 40.0, "presets": [10, 20, 30], "warning": true, "notes": "Very high carbs vs other nuts."}, {"id": "peanut_butter_100", "name": "Peanut butter (100%, unsweetened)", "category": "Nuts & Seeds", "unit": "g", "net_carbs_per_100g": 14.0, "presets": [10, 20, 30, 40], "notes": "Net carbs shown. Easy to overeat."}, {"id": "almond_butter_100", "name": "Almond butter (100%, unsweetened)", "category": "Nuts & Seeds", "unit": "g", "net_carbs_per_100g": 10.0, "presets": [10, 20, 30, 40], "notes": "Net carbs shown. Easy to overeat."}, {"id": "pasta_white_dry", "name": "Pasta (white, dry)", "category": "Limited Carb Foods ⚠️", "unit": "g", "carbs_raw_per_100g": 75.0, "carbs_cooked_per_100g": 30.0, "toggle_raw_cooked": true, "default_state": "raw", "presets_raw": [10, 20, 30], "presets_cooked": [50, 75, 100], "warning": true, "notes": "Cooked values vary with water absorption."}, {"id": "pasta_whole_dry", "name": "Pasta (whole wheat, dry)", "category": "Limited Carb Foods ⚠️", "unit": "g", "carbs_raw_per_100g": 70.0, "carbs_cooked_per_100g": 30.0, "toggle_raw_cooked": true, "default_state": "raw", "presets_raw": [10, 20, 30], "presets_cooked": [50, 75, 100], "warning": true, "notes": "Cooked values vary with water absorption."}, {"id": "rice_white", "name": "Rice (white)", "category": "Limited Carb Foods ⚠️", "unit": "g", "carbs_raw_per_100g": 78.0, "carbs_cooked_per_100g": 28.0, "toggle_raw_cooked": true, "default_state": "raw", "presets_raw": [10, 20, 30], "presets_cooked": [50, 75, 100], "warning": true, "notes": "Cooked values vary with water content."}, {"id": "rice_brown", "name": "Rice (brown)", "category": "Limited Carb Foods ⚠️", "unit": "g", "carbs_raw_per_100g": 76.0, "carbs_cooked_per_100g": 28.0, "toggle_raw_cooked": true, "default_state": "raw", "presets_raw": [10, 20, 30], "presets_cooked": [50, 75, 100], "warning": true, "notes": "Cooked values vary with water content."}, {"id": "quinoa", "name": "Quinoa", "category": "Limited Carb Foods ⚠️", "unit": "g", "carbs_raw_per_100g": 64.0, "carbs_cooked_per_100g": 21.0, "toggle_raw_cooked": true, "default_state": "raw", "presets_raw": [10, 20, 30], "presets_cooked": [50, 75, 100], "warning": true, "notes": "Cooked values vary with water content."}, {"id": "millet", "name": "Millet", "category": "Limited Carb Foods ⚠️", "unit": "g", "carbs_raw_per_100g": 73.0, "carbs_cooked_per_100g": 23.0, "toggle_raw_cooked": true, "default_state": "cooked", "presets_raw": [10, 20, 30], "presets_cooked": [50, 75, 100], "warning": true, "notes": "High impact possible."}, {"id": "polenta", "name": "Polenta (cornmeal)", "category": "Limited Carb Foods ⚠️", "unit": "g", "carbs_raw_per_100g": 76.0, "carbs_cooked_per_100g": 17.0, "toggle_raw_cooked": true, "default_state": "cooked", "presets_raw": [10, 20, 30], "presets_cooked": [50, 75, 100], "warning": true, "notes": "Can spike fast; cooked values vary with water."}, {"id": "potato_white", "name": "Potato (white)", "category": "Limited Carb Foods ⚠️", "unit": "g", "carbs_cooked_per_100g": 17.0, "toggle_raw_cooked": false, "presets": [50, 75, 100], "warning": true, "notes": "Often spikes quickly."}, {"id": "sweet_potato", "name": "Sweet potato", "category": "Limited Carb Foods ⚠️", "unit": "g", "carbs_cooked_per_100g": 20.0, "toggle_raw_cooked": false, "presets": [50, 75, 100], "warning": true, "notes": "Often spikes quickly."}, {"id": "corn_kernels", "name": "Corn / Maïs (kernels, cooked)", "category": "Limited Carb Foods ⚠️", "unit": "g", "carbs_cooked_per_100g": 19.0, "toggle_raw_cooked": false, "presets": [50, 75, 100], "warning": true, "notes": "Can spike faster than beans/lentils."}, {"id": "peas", "name": "Peas (green, cooked)", "category": "Limited Carb Foods ⚠️", "unit": "g", "carbs_cooked_per_100g": 14.0, "toggle_raw_cooked": false, "presets": [50, 75, 100], "warning": true, "notes": "Moderate impact."}, {"id": "white_beans", "name": "Haricot blanc (white beans, cooked)", "category": "Limited Carb Foods ⚠️", "unit": "g", "carbs_cooked_per_100g": 18.0, "toggle_raw_cooked": false, "presets": [50, 75, 100], "warning": true, "notes": "Slow but prolonged rise possible."}, {"id": "kidney_beans", "name": "Haricot rouge (kidney beans, cooked)", "category": "Limited Carb Foods ⚠️", "unit": "g", "carbs_cooked_per_100g": 20.0, "toggle_raw_cooked": false, "presets": [50, 75, 100], "warning": true, "notes": "Slow but prolonged rise possible."}, {"id": "lentils", "name": "Lentils", "category": "Limited Carb Foods ⚠️", "unit": "g", "carbs_raw_per_100g": 60.0, "carbs_cooked_per_100g": 20.0, "toggle_raw_cooked": true, "default_state": "cooked", "presets_raw": [10, 20, 30], "presets_cooked": [50, 75, 100], "warning": true, "notes": "Moderate impact; can rise 2–4h later."}, {"id": "carrots_raw", "name": "Carrots (raw)", "category": "Vegetables", "unit": "g", "carbs_cooked_per_100g": 10.0, "toggle_raw_cooked": false, "presets": [50, 75, 100], "notes": "Measured veg; portion aware."}, {"id": "dextro_energy_lemon_vitc", "name": "Dextro Energy tablets (Lemon + Vitamin C)", "category": "Glucose Tablets", "unit": "tablet", "carbs_per_tablet_g": 4.0, "notes": "Fast-acting glucose for hypoglycemia. Typically, 3 glucose tablets (≈12g glucose) are taken to treat a low blood sugar, then blood glucose should be rechecked after 15 minutes."}],
+  templates: [{"id": "t01", "name": "Template 01", "items": [{"food_id": "avocado_raw", "qty": 50}, {"food_id": "walnuts", "qty": 20}, {"food_id": "carrots_raw", "qty": 50}], "note": "Edit freely. Keep carbs small and predictable."}, {"id": "t02", "name": "Template 02", "items": [{"food_id": "avocado_raw", "qty": 50}, {"food_id": "walnuts", "qty": 20}, {"food_id": "carrots_raw", "qty": 50}], "note": "Edit freely. Keep carbs small and predictable."}, {"id": "t03", "name": "Template 03", "items": [{"food_id": "avocado_raw", "qty": 50}, {"food_id": "walnuts", "qty": 20}, {"food_id": "carrots_raw", "qty": 50}], "note": "Edit freely. Keep carbs small and predictable."}, {"id": "t04", "name": "Template 04", "items": [{"food_id": "avocado_raw", "qty": 50}, {"food_id": "walnuts", "qty": 20}, {"food_id": "carrots_raw", "qty": 50}], "note": "Edit freely. Keep carbs small and predictable."}, {"id": "t05", "name": "Template 05", "items": [{"food_id": "avocado_raw", "qty": 50}, {"food_id": "walnuts", "qty": 20}, {"food_id": "carrots_raw", "qty": 50}], "note": "Edit freely. Keep carbs small and predictable."}, {"id": "t06", "name": "Template 06", "items": [{"food_id": "avocado_raw", "qty": 50}, {"food_id": "walnuts", "qty": 20}, {"food_id": "carrots_raw", "qty": 50}], "note": "Edit freely. Keep carbs small and predictable."}, {"id": "t07", "name": "Template 07", "items": [{"food_id": "avocado_raw", "qty": 50}, {"food_id": "walnuts", "qty": 20}, {"food_id": "carrots_raw", "qty": 50}], "note": "Edit freely. Keep carbs small and predictable."}, {"id": "t08", "name": "Template 08", "items": [{"food_id": "avocado_raw", "qty": 50}, {"food_id": "walnuts", "qty": 20}, {"food_id": "carrots_raw", "qty": 50}], "note": "Edit freely. Keep carbs small and predictable."}, {"id": "t09", "name": "Template 09", "items": [{"food_id": "avocado_raw", "qty": 50}, {"food_id": "walnuts", "qty": 20}, {"food_id": "carrots_raw", "qty": 50}], "note": "Edit freely. Keep carbs small and predictable."}, {"id": "t10", "name": "Template 10", "items": [{"food_id": "avocado_raw", "qty": 50}, {"food_id": "walnuts", "qty": 20}, {"food_id": "carrots_raw", "qty": 50}], "note": "Edit freely. Keep carbs small and predictable."}, {"id": "t11", "name": "Template 11", "items": [{"food_id": "avocado_raw", "qty": 50}, {"food_id": "walnuts", "qty": 20}, {"food_id": "carrots_raw", "qty": 50}], "note": "Edit freely. Keep carbs small and predictable."}, {"id": "t12", "name": "Template 12", "items": [{"food_id": "avocado_raw", "qty": 50}, {"food_id": "walnuts", "qty": 20}, {"food_id": "carrots_raw", "qty": 50}], "note": "Edit freely. Keep carbs small and predictable."}, {"id": "t13", "name": "Template 13", "items": [{"food_id": "avocado_raw", "qty": 50}, {"food_id": "walnuts", "qty": 20}, {"food_id": "carrots_raw", "qty": 50}], "note": "Edit freely. Keep carbs small and predictable."}, {"id": "t14", "name": "Template 14", "items": [{"food_id": "avocado_raw", "qty": 50}, {"food_id": "walnuts", "qty": 20}, {"food_id": "carrots_raw", "qty": 50}], "note": "Edit freely. Keep carbs small and predictable."}, {"id": "t15", "name": "Template 15", "items": [{"food_id": "avocado_raw", "qty": 50}, {"food_id": "walnuts", "qty": 20}, {"food_id": "carrots_raw", "qty": 50}], "note": "Edit freely. Keep carbs small and predictable."}, {"id": "t16", "name": "Template 16", "items": [{"food_id": "avocado_raw", "qty": 50}, {"food_id": "walnuts", "qty": 20}, {"food_id": "carrots_raw", "qty": 50}], "note": "Edit freely. Keep carbs small and predictable."}, {"id": "t17", "name": "Template 17", "items": [{"food_id": "avocado_raw", "qty": 50}, {"food_id": "walnuts", "qty": 20}, {"food_id": "carrots_raw", "qty": 50}], "note": "Edit freely. Keep carbs small and predictable."}, {"id": "t18", "name": "Template 18", "items": [{"food_id": "avocado_raw", "qty": 50}, {"food_id": "walnuts", "qty": 20}, {"food_id": "carrots_raw", "qty": 50}], "note": "Edit freely. Keep carbs small and predictable."}, {"id": "t19", "name": "Template 19", "items": [{"food_id": "avocado_raw", "qty": 50}, {"food_id": "walnuts", "qty": 20}, {"food_id": "carrots_raw", "qty": 50}], "note": "Edit freely. Keep carbs small and predictable."}, {"id": "t20", "name": "Template 20", "items": [{"food_id": "avocado_raw", "qty": 50}, {"food_id": "walnuts", "qty": 20}, {"food_id": "carrots_raw", "qty": 50}], "note": "Edit freely. Keep carbs small and predictable."}, {"id": "t21", "name": "Template 21", "items": [{"food_id": "avocado_raw", "qty": 50}, {"food_id": "walnuts", "qty": 20}, {"food_id": "carrots_raw", "qty": 50}], "note": "Edit freely. Keep carbs small and predictable."}, {"id": "t22", "name": "Template 22", "items": [{"food_id": "avocado_raw", "qty": 50}, {"food_id": "walnuts", "qty": 20}, {"food_id": "carrots_raw", "qty": 50}], "note": "Edit freely. Keep carbs small and predictable."}, {"id": "t23", "name": "Template 23", "items": [{"food_id": "avocado_raw", "qty": 50}, {"food_id": "walnuts", "qty": 20}, {"food_id": "carrots_raw", "qty": 50}], "note": "Edit freely. Keep carbs small and predictable."}, {"id": "t24", "name": "Template 24", "items": [{"food_id": "avocado_raw", "qty": 50}, {"food_id": "walnuts", "qty": 20}, {"food_id": "carrots_raw", "qty": 50}], "note": "Edit freely. Keep carbs small and predictable."}, {"id": "t25", "name": "Template 25", "items": [{"food_id": "avocado_raw", "qty": 50}, {"food_id": "walnuts", "qty": 20}, {"food_id": "carrots_raw", "qty": 50}], "note": "Edit freely. Keep carbs small and predictable."}],
+  defaultSettings: {
+    target_bg_mgdl: 100,
+    isf_mgdl_per_u: 40,
+    icr_g_per_u: 10,
+    glucose_tab_brand: "Dextro Energy Lemon + Vitamin C",
+    glucose_tab_grams: 4,
+    carb_sensitivity_mgdl_per_tab: 15,
+    hypo_threshold: 70,
+    urgent_hypo_threshold: 54
+  },
+};
 
-const PROT_ITEMS = [
-  {id:"fish", name:"Deck fish/poultry", unit:"deck", oz:3.0},
-  {id:"red", name:"Deck red meat", unit:"deck", oz:3.7},
-  {id:"egg", name:"Egg", unit:"egg", oz:1.0},
-  {id:"cheese", name:"Cheese", unit:"30 g", oz:1.0}
-];
-
-// 25+ templates (mostly Bernstein-friendly patterns; adjust as needed)
-const TEMPLATES = [
-  // Breakfast (6g-ish)
-  {name:"B1: 1 Wasa + 2 eggs + cucumber", carbs:{wasa:1,cuke:1}, prot:{egg:2}},
-  {name:"B2: 1 Wasa + smoked salmon (1 fish deck)", carbs:{wasa:1}, prot:{fish:1}},
-  {name:"B3: 1 Wasa + omelette (3 eggs)", carbs:{wasa:1}, prot:{egg:3}},
-  {name:"B4: 1 Wasa + cheese 30g + 2 eggs", carbs:{wasa:1}, prot:{cheese:1, egg:2}},
-  {name:"B5: 1 cup salad + 1 Wasa + sardines (1 fish deck)", carbs:{salad:1,wasa:1}, prot:{fish:1}},
-  {name:"B6: Tomato + 2 eggs + cheese 30g", carbs:{tom:1}, prot:{egg:2,cheese:1}},
-  {name:"B7: 1 Wasa + tuna/chicken (1 fish deck) + cucumber", carbs:{wasa:1,cuke:1}, prot:{fish:1}},
-  {name:"B8: 1 Wasa + 1 egg + 1 fish deck", carbs:{wasa:1}, prot:{egg:1,fish:1}},
-  // Lunch (12g-ish)
-  {name:"L1: Salad 2 cups + chicken (2 fish decks)", carbs:{salad:2}, prot:{fish:2}},
-  {name:"L2: Salad 2 cups + tuna/sardines (1 fish deck) + 1 Wasa", carbs:{salad:2,wasa:1}, prot:{fish:1}},
-  {name:"L3: Broccoli 1 cup (2×½) + steak (1 red deck)", carbs:{broc:2}, prot:{red:1}},
-  {name:"L4: Cauliflower 1 cup + chicken (2 fish decks)", carbs:{caul:2}, prot:{fish:2}},
-  {name:"L5: Green beans 1 cup + fish (2 fish decks)", carbs:{beans:2}, prot:{fish:2}},
-  {name:"L6: Salad 2 cups + burger patties (1 red deck)", carbs:{salad:2}, prot:{red:1}},
-  {name:"L7: Zucchini 1.5 cups (3×½) + shrimp/chicken (2 fish decks)", carbs:{zuch:3}, prot:{fish:2}},
-  {name:"L8: Salad 1 cup + broccoli 1/2 cup + tuna (2 fish decks)", carbs:{salad:1,broc:1}, prot:{fish:2}},
-  {name:"L9: Salad 2 cups + egg salad (3 eggs)", carbs:{salad:2}, prot:{egg:3}},
-  // Dinner (12g-ish)
-  {name:"D1: Salad 2 cups + salmon (2 fish decks)", carbs:{salad:2}, prot:{fish:2}},
-  {name:"D2: Broccoli 1 cup + steak (2 red decks)", carbs:{broc:2}, prot:{red:2}},
-  {name:"D3: Cauliflower 1 cup + roast chicken (2 fish decks)", carbs:{caul:2}, prot:{fish:2}},
-  {name:"D4: Green beans 1 cup + fish (2 fish decks)", carbs:{beans:2}, prot:{fish:2}},
-  {name:"D5: Zucchini 1 cup + turkey (2 fish decks) + salad 1 cup", carbs:{zuch:2,salad:1}, prot:{fish:2}},
-  {name:"D6: Salad 2 cups + lamb/beef (2 red decks)", carbs:{salad:2}, prot:{red:2}},
-  {name:"D7: Broccoli 1/2 cup + salad 1 cup + sardines (1 fish deck) + 2 eggs", carbs:{broc:1,salad:1}, prot:{fish:1,egg:2}},
-  {name:"D8: Cauliflower 1/2 cup + salad 1 cup + chicken (2 fish decks)", carbs:{caul:1,salad:1}, prot:{fish:2}},
-  {name:"D9: Salad 2 cups + cheese 60g + 2 eggs", carbs:{salad:2}, prot:{cheese:2,egg:2}},
-  // Extra (to reach 25+)
-  {name:"X1: Salad 3 cups + chicken (2 fish decks)", carbs:{salad:3}, prot:{fish:2}},
-  {name:"X2: Broccoli 1 cup + fish (1 fish deck) + 1 egg", carbs:{broc:2}, prot:{fish:1,egg:1}},
-  {name:"X3: 2 Wasa + tuna (1 fish deck)", carbs:{wasa:2}, prot:{fish:1}},
-  {name:"X4: Salad 1 cup + beans 1/2 cup + steak (1 red deck)", carbs:{salad:1,beans:1}, prot:{red:1}},
-  {name:"X5: Zucchini 2 cups + chicken (2 fish decks)", carbs:{zuch:4}, prot:{fish:2}}
-];
-
-/* ---------- State ---------- */
-const carbCounts = Object.fromEntries(CARB_ITEMS.map(x=>[x.id,0]));
-const protCounts = Object.fromEntries(PROT_ITEMS.map(x=>[x.id,0]));
-let advCarb = 0.0;
-let advProtOz = 0.0;
-
-/* ---------- Render lists ---------- */
-function makeLine(title, subtitle, id, onMinus, onPlus, getCount){
-  const wrap = document.createElement("div");
-  wrap.className = "line";
-  wrap.innerHTML = `
-    <div>
-      <div class="name">${title}</div>
-      <div class="sub">${subtitle}</div>
-    </div>
-    <div class="ctrl">
-      <button class="pillbtn" type="button">−</button>
-      <div class="count mono">0</div>
-      <button class="pillbtn" type="button">+</button>
-    </div>
-  `;
-  const minus = wrap.querySelectorAll("button")[0];
-  const plus = wrap.querySelectorAll("button")[1];
-  const countEl = wrap.querySelector(".count");
-  minus.onclick = () => { onMinus(); countEl.textContent = getCount(); updateTotals(); };
-  plus.onclick  = () => { onPlus();  countEl.textContent = getCount(); updateTotals(); };
-  countEl.textContent = getCount();
-  return wrap;
+function $(sel){ return document.querySelector(sel); }
+function el(tag, attrs={}, children=[]) {
+  const n = document.createElement(tag);
+  for (const [k,v] of Object.entries(attrs)) {
+    if (k === "class") n.className = v;
+    else if (k === "html") n.innerHTML = v;
+    else if (k.startsWith("on") && typeof v === "function") n.addEventListener(k.slice(2), v);
+    else n.setAttribute(k, v);
+  }
+  for (const c of children) n.appendChild(typeof c === "string" ? document.createTextNode(c) : c);
+  return n;
+}
+function toast(msg) {
+  const t = $("#toast");
+  t.textContent = msg;
+  t.style.display = "block";
+  clearTimeout(window.__toastT);
+  window.__toastT = setTimeout(()=> t.style.display="none", 2200);
 }
 
-function render(){
-  const carbList = document.getElementById("carbList");
-  carbList.innerHTML = "";
-  CARB_ITEMS.forEach(item=>{
-    const subtitle = `${item.grams} g carbs per ${item.unit}`;
-    carbList.appendChild(makeLine(item.name, subtitle, item.id,
-      ()=>carbCounts[item.id]=Math.max(0, carbCounts[item.id]-1),
-      ()=>carbCounts[item.id]=carbCounts[item.id]+1,
-      ()=>carbCounts[item.id]
-    ));
-  });
-
-  const protList = document.getElementById("protList");
-  protList.innerHTML = "";
-  PROT_ITEMS.forEach(item=>{
-    const subtitle = `${item.oz} oz protein-food per ${item.unit}`;
-    protList.appendChild(makeLine(item.name, subtitle, item.id,
-      ()=>protCounts[item.id]=Math.max(0, protCounts[item.id]-1),
-      ()=>protCounts[item.id]=protCounts[item.id]+1,
-      ()=>protCounts[item.id]
-    ));
-  });
-
-  // templates dropdown
-  const tpl = document.getElementById("tpl");
-  tpl.innerHTML = "";
-  TEMPLATES.forEach((t,i)=>{
-    const opt = document.createElement("option");
-    opt.value = i;
-    opt.textContent = t.name;
-    tpl.appendChild(opt);
-  });
-}
-
-/* ---------- Totals ---------- */
-function carbTotalG(){
-  let total = advCarb;
-  CARB_ITEMS.forEach(i=>{ total += carbCounts[i.id] * i.grams; });
-  return total;
-}
-function proteinTotalOz(){
-  let total = advProtOz;
-  PROT_ITEMS.forEach(i=>{ total += protCounts[i.id] * i.oz; });
-  return total;
-}
-function updateTotals(){
-  document.getElementById("carbTotal").textContent = carbTotalG().toFixed(1) + " g";
-  document.getElementById("proteinOz").textContent = proteinTotalOz().toFixed(1);
-  updateBgMmol();
-}
-
-/* ---------- BG display ---------- */
-function updateBgMmol(){
-  const bg = Number(document.getElementById("bgNow").value || 0);
-  const tgt = Number(document.getElementById("bgTarget").value || 100);
-  document.getElementById("bgNowMmol").textContent = bg ? (bg/18).toFixed(1) : "—";
-  document.getElementById("bgTargetMmol").textContent = tgt ? (tgt/18).toFixed(1) : "—";
-}
-
-/* ---------- Calculation ---------- */
-function roundToStep(x, step){ return Math.round(x/step)*step; }
-
-function calc(){
-  const carbs = carbTotalG();
-  const protOz = proteinTotalOz();
-
-  const roundStep = Number(document.getElementById("roundStep").value || 0.5);
-
-  // Bernstein meal dose:
-  // carbs ÷ 8, protein ounces ÷ 1.5
-  const meal = (carbs/8) + (protOz/1.5);
-
-  // Correction:
-  const bg = Number(document.getElementById("bgNow").value || 0);
-  const tgt = Number(document.getElementById("bgTarget").value || 100);
-  const cf = Number(document.getElementById("corrFactor").value || 40);
-  const corr = (bg && bg > tgt && cf>0) ? ((bg - tgt)/cf) : 0;
-
-  const mealR = roundToStep(meal, roundStep);
-  const corrR = roundToStep(corr, roundStep);
-  const total = mealR + corrR;
-
-  document.getElementById("mealU").textContent = mealR.toFixed(2) + " U";
-  document.getElementById("corrU").textContent = corrR.toFixed(2) + " U";
-  document.getElementById("totalU").textContent = total.toFixed(2) + " U";
-
-  // feedback
-  const msg = document.getElementById("msg");
-  msg.innerHTML = "";
-  if(carbs >= 25){
-    msg.innerHTML = '<div class="warn"><b>Note:</b> Carbs are high for Bernstein-style eating. Consider reducing vegetable/cracker portions.</div>';
+const storageKey = "bernstein_coach_v7_state";
+function loadState() {
+  try {
+    const raw = localStorage.getItem(storageKey);
+    if (!raw) return {
+      settings: structuredClone(V7.defaultSettings),
+      meal: [],
+      bg_mgdl: "",
+      notes: "",
+      lastTab: "Calculator",
+      foodSearch: "",
+      foodCategory: "All",
+    };
+    const s = JSON.parse(raw);
+    s.settings = Object.assign(structuredClone(V7.defaultSettings), s.settings || {});
+    s.meal = Array.isArray(s.meal) ? s.meal : [];
+    s.lastTab = s.lastTab || "Calculator";
+    s.foodSearch = s.foodSearch || "";
+    s.foodCategory = s.foodCategory || "All";
+    return s;
+  } catch(e) {
+    return {
+      settings: structuredClone(V7.defaultSettings),
+      meal: [],
+      bg_mgdl: "",
+      notes: "",
+      lastTab: "Calculator",
+      foodSearch: "",
+      foodCategory: "All",
+    };
   }
 }
+function saveState(){ localStorage.setItem(storageKey, JSON.stringify(state)); }
+let state = loadState();
 
-/* ---------- Templates ---------- */
-function applyTemplate(){
-  const idx = Number(document.getElementById("tpl").value || 0);
-  const t = TEMPLATES[idx];
-
-  // reset counts first
-  CARB_ITEMS.forEach(i=>carbCounts[i.id]=0);
-  PROT_ITEMS.forEach(i=>protCounts[i.id]=0);
-  advCarb = 0; advProtOz = 0;
-  resetAdvanced(false);
-
-  if(t.carbs){
-    Object.entries(t.carbs).forEach(([k,v])=>{
-      if(k in carbCounts) carbCounts[k] = v;
-    });
+function carbsForFood(food, qty, rawCookedState=null) {
+  if (food.unit === "tablet") return (food.carbs_per_tablet_g || 0) * qty;
+  if (food.net_carbs_per_100g != null) return (food.net_carbs_per_100g * qty) / 100.0;
+  if (food.toggle_raw_cooked) {
+    const mode = rawCookedState || food.default_state || "cooked";
+    const per100 = (mode === "raw") ? food.carbs_raw_per_100g : food.carbs_cooked_per_100g;
+    return (per100 * qty) / 100.0;
   }
-  if(t.prot){
-    Object.entries(t.prot).forEach(([k,v])=>{
-      if(k in protCounts) protCounts[k] = v;
-    });
+  const per100 = food.carbs_cooked_per_100g ?? food.carbs_per_100g ?? 0;
+  return (per100 * qty) / 100.0;
+}
+
+function mealTotals() {
+  let carbs = 0;
+  let warnings = 0;
+  for (const item of state.meal) {
+    const food = V7.foods.find(f=>f.id===item.food_id);
+    if (!food) continue;
+    carbs += carbsForFood(food, item.qty, item.mode);
+    if (food.warning) warnings++;
+    if ((food.category||"").includes("Limited")) warnings++;
   }
-  render();
-  updateTotals();
-  calc();
+  return { carbs, warnings };
 }
 
-/* ---------- Reset ---------- */
-function resetAll(){
-  CARB_ITEMS.forEach(i=>carbCounts[i.id]=0);
-  PROT_ITEMS.forEach(i=>protCounts[i.id]=0);
-  advCarb = 0; advProtOz = 0;
-  document.getElementById("advCarbG").value = 0;
-  document.getElementById("advProtG").value = 0;
-  render();
-  updateTotals();
-  document.getElementById("mealU").textContent = "0.00 U";
-  document.getElementById("corrU").textContent = "0.00 U";
-  document.getElementById("totalU").textContent = "0.00 U";
-  document.getElementById("msg").innerHTML = "";
+function correctionInsulinUnits(bg) {
+  const target = state.settings.target_bg_mgdl;
+  const isf = state.settings.isf_mgdl_per_u;
+  const delta = bg - target;
+  if (!isf || isf <= 0 || delta <= 0) return 0;
+  return delta / isf;
 }
 
-/* ---------- Advanced grams ---------- */
-function applyAdvanced(){
-  const c = Number(document.getElementById("advCarbG").value || 0);
-  const p = Number(document.getElementById("advProtG").value || 0);
-  advCarb += c;
-  // protein_g ÷ 6 => ounces protein food
-  advProtOz += (p/6);
-  resetAdvanced(false);
-  updateTotals();
-  calc();
-}
-function resetAdvanced(clear=true){
-  if(clear){
-    advCarb = 0; advProtOz = 0;
-  }
-  document.getElementById("advCarbG").value = 0;
-  document.getElementById("advProtG").value = 0;
+function hypoTabletsNeeded(bg) {
+  const target = state.settings.target_bg_mgdl;
+  const csf = state.settings.carb_sensitivity_mgdl_per_tab || 15;
+  const delta = target - bg;
+  if (!csf || csf <= 0 || delta <= 0) return 0;
+  return Math.max(1, Math.ceil(delta / csf));
 }
 
-/* ---------- Last meal snapshot ---------- */
-function saveSnapshot(){
-  const snap = {
-    carbCounts, protCounts, advCarb, advProtOz,
-    bgNow: Number(document.getElementById("bgNow").value||100),
-    bgTarget: Number(document.getElementById("bgTarget").value||100),
-    corrFactor: Number(document.getElementById("corrFactor").value||40),
-    roundStep: Number(document.getElementById("roundStep").value||0.5)
-  };
-  localStorage.setItem("bernstein_lastmeal_v6", JSON.stringify(snap));
-  alert("Saved as last meal.");
-}
-
-/* ---------- Events ---------- */
-["bgNow","bgTarget","corrFactor","roundStep"].forEach(id=>{
-  document.addEventListener("input", (e)=>{
-    if(e.target && e.target.id===id){ updateTotals(); calc(); }
+function renderTabs() {
+  const tabs = ["Calculator","Foods","Templates","Settings"];
+  const host = $("#tabs");
+  host.innerHTML = "";
+  tabs.forEach(t=> {
+    host.appendChild(el("div", {
+      class: "tab" + (state.lastTab===t ? " active":""),
+      onclick: ()=>{ state.lastTab=t; saveState(); render(); }
+    }, [t]));
   });
-});
+}
 
-/* ---------- Init ---------- */
+function renderDosePanel(bgNum, mealCarbs) {
+  const target = state.settings.target_bg_mgdl;
+  const hypoT = state.settings.hypo_threshold;
+  const urgentT = state.settings.urgent_hypo_threshold;
+  const icr = state.settings.icr_g_per_u;
+
+  if (!Number.isFinite(bgNum) || state.bg_mgdl==="") return el("div", {class:"muted"}, ["Enter BG to see guidance."]);
+
+  if (bgNum < hypoT) {
+    const urgent = bgNum < urgentT;
+    const tabs = hypoTabletsNeeded(bgNum);
+    const perTab = state.settings.glucose_tab_grams || 4;
+    const grams = tabs * perTab;
+    return el("div", {}, [
+      el("div", {class: "pill " + (urgent ? "danger":"warn")}, [urgent ? "🚨 URGENT LOW" : "⚠️ LOW BG"]),
+      el("div", {style:"height:10px"}),
+      el("div", {class:"kpi"}, [
+        el("div", {}, [el("div", {class:"muted small"}, ["Treat with glucose tablets"]), el("div", {class:"val mono"}, [String(tabs), " tabs"])]),
+        el("div", {class:"right"}, [el("div", {class:"muted small"}, ["≈ " + grams.toFixed(0) + " g glucose"])]),
+      ]),
+      el("div", {class:"muted small", style:"margin-top:8px"}, [
+        "Typically, 3 glucose tablets (≈12g glucose) are taken to treat a low blood sugar, then blood glucose should be rechecked after 15 minutes."
+      ]),
+      el("div", {class:"hr"}),
+      el("div", {class:"muted small"}, [
+        "If severe symptoms or cannot swallow: follow your emergency plan (glucagon if prescribed) and seek urgent help."
+      ])
+    ]);
+  }
+
+  const corr = correctionInsulinUnits(bgNum);
+  const mealU = (icr && icr>0) ? (mealCarbs / icr) : 0;
+  const total = corr + mealU;
+
+  return el("div", {}, [
+    el("div", {class:"row"}, [
+      el("span", {class:"pill"}, ["ISF ", el("span", {class:"mono"}, [String(state.settings.isf_mgdl_per_u)]), " mg/dL/U"]),
+      el("span", {class:"pill"}, ["ICR ", el("span", {class:"mono"}, [String(icr)]), " g/U"]),
+      el("span", {class:"pill"}, ["Target ", el("span", {class:"mono"}, [String(target)]), " mg/dL"]),
+    ]),
+    el("div", {style:"height:10px"}),
+    el("div", {class:"kpi"}, [
+      el("div", {}, [el("div", {class:"muted small"}, ["Meal insulin (carbs/ICR)"]), el("div", {class:"val mono"}, [mealU.toFixed(2), " U"])]),
+      el("div", {class:"right"}, [el("div", {class:"muted small"}, ["Correction insulin"]), el("div", {class:"val mono"}, [corr.toFixed(2), " U"])]),
+    ]),
+    el("div", {class:"hr"}),
+    el("div", {class:"kpi"}, [
+      el("div", {}, [el("div", {class:"muted small"}, ["Suggested total (meal + correction)"]), el("div", {class:"val mono"}, [total.toFixed(2), " U"])]),
+      el("div", {class:"right muted small"}, ["(Guidance only)"]
+    ]),
+  ]);
+}
+
+function exportSummary() {
+  const t = mealTotals();
+  const carbs = t.carbs;
+  const bgNum = Number(state.bg_mgdl);
+  const corr = Number.isFinite(bgNum) ? correctionInsulinUnits(bgNum) : 0;
+  const icr = state.settings.icr_g_per_u;
+  const mealU = (icr && icr>0) ? carbs/icr : 0;
+  const total = corr + mealU;
+  const lines = [];
+  lines.push("Bernstein Coach v7 summary");
+  lines.push("Meal carbs: " + carbs.toFixed(1) + " g");
+  if (state.bg_mgdl!=="") lines.push("BG: " + state.bg_mgdl + " mg/dL (target " + state.settings.target_bg_mgdl + ")");
+  lines.push("Meal insulin: " + mealU.toFixed(2) + " U (ICR " + state.settings.icr_g_per_u + " g/U)");
+  lines.push("Correction: " + corr.toFixed(2) + " U (ISF " + state.settings.isf_mgdl_per_u + " mg/dL/U)");
+  lines.push("Suggested total: " + total.toFixed(2) + " U");
+  lines.push("Items:");
+  for (const it of state.meal) {
+    const f = V7.foods.find(x=>x.id===it.food_id);
+    const c = f ? carbsForFood(f, it.qty, it.mode) : 0;
+    const mode = f && f.toggle_raw_cooked ? (" (" + ((it.mode||f.default_state)==="raw" ? "raw" : "cooked") + ")") : "";
+    lines.push("- " + (f?f.name:it.food_id) + mode + ": " + it.qty + (f?.unit||"g") + " -> " + c.toFixed(1) + " g");
+  }
+  if (state.notes) lines.push("Notes: " + state.notes);
+  return lines.join("\n");
+}
+
+function renderCalculator() {
+  const t = mealTotals();
+  const carbs = t.carbs;
+  const warnings = t.warnings;
+  const bgNum = Number(state.bg_mgdl);
+
+  const left = el("div", {class:"card"}, [
+    el("div", {class:"kpi"}, [
+      el("div", {}, [el("div", {class:"muted small"}, ["Meal net carbs"]), el("div", {class:"val mono"}, [carbs.toFixed(1) + " g"])]),
+      el("div", {class:"right"}, [
+        warnings>0 ? el("span", {class:"pill warn"}, ["⚠️ limited foods"]) : el("span", {class:"pill"}, ["✓ predictable"]),
+      ])
+    ]),
+    el("div", {class:"hr"}),
+    el("div", {class:"row"}, [
+      el("div", {style:"flex:1; min-width:220px;"}, [
+        el("label", {}, ["Current BG (mg/dL)"]),
+        el("input", {inputmode:"numeric", placeholder:"e.g. 110", value: state.bg_mgdl,
+          oninput:(e)=>{ state.bg_mgdl=e.target.value; saveState(); render(); }
+        }),
+      ]),
+      el("div", {style:"flex:1; min-width:220px;"}, [
+        el("label", {}, ["Notes (optional)"]),
+        el("input", {placeholder:"e.g. post-workout / stress / IOB", value: state.notes,
+          oninput:(e)=>{ state.notes=e.target.value; saveState(); }
+        }),
+      ]),
+    ]),
+    el("div", {class:"hr"}),
+    renderDosePanel(bgNum, carbs),
+  ]);
+
+  const right = el("div", {class:"card"}, [
+    el("h2", {}, ["Meal items"]),
+    state.meal.length===0 ? el("div", {class:"muted"}, ["No items yet. Go to Foods → add items."]) :
+      el("div", {}, state.meal.map((it, idx)=>{
+        const food = V7.foods.find(f=>f.id===it.food_id);
+        const c = food ? carbsForFood(food, it.qty, it.mode) : 0;
+        const mode = food?.toggle_raw_cooked ? ((it.mode||food.default_state)==="raw" ? "Raw/Dry · " : "Cooked · ") : "";
+        return el("div", {class:"foodrow"}, [
+          el("div", {}, [
+            el("div", {}, [food ? food.name : it.food_id]),
+            el("div", {class:"muted small"}, [mode + it.qty + " " + (food?.unit || "g") + " · " + c.toFixed(1) + " g carbs"]),
+          ]),
+          el("button", {class:"btn", onclick:()=>{ state.meal.splice(idx,1); saveState(); render(); toast("Removed"); } }, ["Remove"]),
+        ]);
+      }))
+    ,
+    el("div", {class:"hr"}),
+    el("div", {class:"row"}, [
+      el("button", {class:"btn", onclick:()=>{ state.meal=[]; saveState(); render(); toast("Meal reset"); } }, ["Reset meal"]),
+      el("button", {class:"btn primary", onclick:()=>{ navigator.clipboard?.writeText(exportSummary()); toast("Copied summary"); } }, ["Copy summary"]),
+    ]),
+    el("div", {class:"muted small", style:"margin-top:8px"}, [
+      "Tip: With ⚠️ limited foods, consider checking BG at 1–2h and 3–4h."
+    ])
+  ]);
+
+  return el("div", {class:"grid"}, [left, right]);
+}
+
+function ensureMealItem(food) {
+  let idx = state.meal.findIndex(it => it.food_id===food.id);
+  if (idx < 0) {
+    state.meal.push({food_id: food.id, qty: food.unit==="tablet"?3:(food.presets?.[0]||food.presets_cooked?.[0]||50), mode: food.toggle_raw_cooked ? (food.default_state||"cooked") : null });
+    idx = state.meal.length - 1;
+  }
+  return idx;
+}
+function setFoodMode(food, mode) {
+  const idx = ensureMealItem(food);
+  state.meal[idx].mode = mode;
+  saveState(); render();
+}
+function setFoodQty(food, qty, silent=false) {
+  const idx = ensureMealItem(food);
+  const q = Math.max(0, Math.round(Number(qty)));
+  state.meal[idx].qty = q;
+  saveState(); render();
+  if (!silent) toast("Set " + food.name);
+}
+function adjustFood(food, delta) {
+  const idx = ensureMealItem(food);
+  const step = (food.unit==="tablet") ? 1 : 5;
+  state.meal[idx].qty = Math.max(0, (state.meal[idx].qty||0) + delta*step);
+  saveState(); render();
+}
+function addOrUpdateMeal(food) {
+  ensureMealItem(food);
+  saveState(); render();
+  toast("Saved to meal");
+}
+function removeFromMeal(food) {
+  const idx = state.meal.findIndex(it => it.food_id===food.id);
+  if (idx>=0) state.meal.splice(idx,1);
+  saveState(); render();
+  toast("Removed");
+}
+
+function foodCard(food) {
+  const mealItemIdx = state.meal.findIndex(it => it.food_id===food.id);
+  const existing = mealItemIdx >= 0 ? state.meal[mealItemIdx] : null;
+  const mode = existing?.mode || food.default_state || (food.toggle_raw_cooked ? "cooked" : null);
+  const qty = existing?.qty || (food.unit==="tablet" ? 3 : (food.presets?.[0] || food.presets_cooked?.[0] || 50));
+  const c = carbsForFood(food, qty, mode);
+
+  const per100 = (()=>{
+    if (food.unit==="tablet") return null;
+    if (food.net_carbs_per_100g!=null) return food.net_carbs_per_100g;
+    if (food.toggle_raw_cooked) return (mode==="raw") ? food.carbs_raw_per_100g : food.carbs_cooked_per_100g;
+    return food.carbs_cooked_per_100g ?? food.carbs_per_100g ?? null;
+  })();
+
+  const header = el("div", {class:"row", style:"justify-content:space-between; align-items:flex-start;"}, [
+    el("div", {}, [
+      el("div", {}, [food.name + (food.warning ? " ⚠️" : "")]),
+      el("div", {class:"muted small"}, [
+        food.category +
+        (per100!=null ? (" · " + per100 + " g/100g" + (food.net_carbs_per_100g!=null ? " (net)" : "")) : "") +
+        (food.unit==="tablet" ? (" · " + (food.carbs_per_tablet_g||0) + " g/tab") : "")
+      ]),
+    ]),
+    el("div", {class:"right"}, [
+      el("div", {class:"muted small"}, ["This portion"]),
+      el("div", {class:"mono", style:"font-size:18px;font-weight:900;"}, [c.toFixed(1) + " g"]),
+    ])
+  ]);
+
+  const modeSeg = food.toggle_raw_cooked ? el("div", {class:"seg", style:"margin-top:10px;"}, [
+    el("button", {class:"btn" + (mode==="raw" ? " primary":""), onclick:()=>setFoodMode(food, "raw")}, ["Raw/Dry"]),
+    el("button", {class:"btn" + (mode==="cooked" ? " primary":""), onclick:()=>setFoodMode(food, "cooked")}, ["Cooked"]),
+  ]) : el("span");
+
+  const presets = (()=>{
+    if (food.unit==="tablet") return [1,2,3,4];
+    if (food.toggle_raw_cooked) return (mode==="raw" ? (food.presets_raw||[10,20,30]) : (food.presets_cooked||[50,75,100]));
+    return food.presets || [50,75,100];
+  })();
+
+  const presetButtons = el("div", {class:"seg", style:"margin-top:10px;"}, presets.map(p =>
+    el("button", {class:"btn", onclick:()=>setFoodQty(food, p)}, [String(p) + " " + (food.unit||"g")])
+  ));
+
+  const counter = el("div", {class:"row", style:"margin-top:10px; align-items:center;"}, [
+    el("button", {class:"btn", onclick:()=>adjustFood(food, -1)}, ["−"]),
+    el("div", {style:"flex:1;"}, [
+      el("input", {value: qty, inputmode:"numeric",
+        oninput:(e)=>setFoodQty(food, e.target.value, true)
+      }),
+      el("div", {class:"muted small"}, ["Quantity in " + (food.unit==="tablet"?"tablets":"grams") + "."])
+    ]),
+    el("button", {class:"btn", onclick:()=>adjustFood(food, +1)}, ["+"]),
+  ]);
+
+  const actions = el("div", {class:"row", style:"margin-top:10px;"}, [
+    el("button", {class:"btn primary", onclick:()=>addOrUpdateMeal(food)}, [existing ? "Update meal" : "Add to meal"]),
+    existing ? el("button", {class:"btn", onclick:()=>removeFromMeal(food)}, ["Remove"]) : el("button", {class:"btn", onclick:()=>toast("Pick a portion then Add")}, ["Info"]),
+  ]);
+
+  const note = food.notes ? el("div", {class:"muted small", style:"margin-top:10px;"}, [food.notes]) : el("span");
+
+  return el("div", {class:"card"}, [header, modeSeg, presetButtons, counter, actions, note]);
+}
+
+function renderFoods() {
+  const cats = ["All", ...Array.from(new Set(V7.foods.map(f=>f.category))).sort()];
+  const search = (state.foodSearch||"").toLowerCase().trim();
+  const cat = state.foodCategory || "All";
+
+  const list = V7.foods
+    .filter(f => (cat==="All" || f.category===cat))
+    .filter(f => !search || f.name.toLowerCase().includes(search))
+    .sort((a,b)=>a.name.localeCompare(b.name));
+
+  const top = el("div", {class:"card"}, [
+    el("div", {class:"row"}, [
+      el("div", {style:"flex:1; min-width:220px;"}, [
+        el("label", {}, ["Search"]),
+        el("input", {placeholder:"type a food (e.g. rice, avocado, nuts)", value: state.foodSearch,
+          oninput:(e)=>{ state.foodSearch=e.target.value; saveState(); render(); }
+        }),
+      ]),
+      el("div", {style:"flex:1; min-width:220px;"}, [
+        el("label", {}, ["Category"]),
+        el("select", {onchange:(e)=>{ state.foodCategory=e.target.value; saveState(); render(); } }, [
+          ...cats.map(c=> el("option", {value:c, selected: c===cat}, [c]))
+        ]),
+      ]),
+    ]),
+    el("div", {class:"muted small", style:"margin-top:8px"}, [
+      "For grains/legumes, use ", el("span", {class:"kbd"}, ["Raw/Dry"]), " when possible for best accuracy."
+    ]),
+  ]);
+
+  return el("div", {class:"row", style:"flex-direction:column; gap:10px;"}, [top, ...list.map(foodCard)]);
+}
+
+function loadTemplate(t) {
+  state.meal = t.items.map(it => ({food_id: it.food_id, qty: it.qty, mode: null}));
+  saveState(); render();
+  toast("Loaded " + t.name);
+  state.lastTab = "Calculator"; saveState(); render();
+}
+
+function renderTemplates() {
+  const header = el("div", {class:"card"}, [
+    el("div", {class:"row", style:"justify-content:space-between; align-items:center;"}, [
+      el("div", {}, [
+        el("div", {}, ["Meal templates (25)"]),
+        el("div", {class:"muted small"}, ["Tap one to load it into the current meal."]),
+      ]),
+      el("button", {class:"btn", onclick:()=>{ state.meal=[]; saveState(); render(); toast("Meal cleared"); } }, ["Clear meal"]),
+    ]),
+  ]);
+
+  const list = V7.templates.map(t => el("div", {class:"card"}, [
+    el("div", {class:"row", style:"justify-content:space-between; align-items:center;"}, [
+      el("div", {}, [el("div", {}, [t.name]), el("div", {class:"muted small"}, [t.note])]),
+      el("button", {class:"btn primary", onclick:()=>loadTemplate(t)}, ["Load"]),
+    ]),
+  ]));
+
+  return el("div", {class:"row", style:"flex-direction:column; gap:10px;"}, [header, ...list]);
+}
+
+function clampInt(v, lo, hi) {
+  const n = Math.round(Number(v));
+  if (!Number.isFinite(n)) return lo;
+  return Math.min(hi, Math.max(lo, n));
+}
+function clampFloat(v, lo, hi) {
+  const n = Number(v);
+  if (!Number.isFinite(n)) return lo;
+  return Math.min(hi, Math.max(lo, n));
+}
+function field(labelText, value, onChange) {
+  return el("div", {style:"flex:1; min-width:220px;"}, [
+    el("label", {}, [labelText]),
+    el("input", {value: value, inputmode:"numeric", oninput:(e)=>onChange(e.target.value)}),
+  ]);
+}
+
+function renderSettings() {
+  const s = state.settings;
+  const card = el("div", {class:"card"}, [
+    el("h2", {}, ["Calibration"]),
+    el("div", {class:"row"}, [
+      field("Target BG (mg/dL)", s.target_bg_mgdl, (v)=>{ s.target_bg_mgdl = clampInt(v, 60, 140); saveState(); render(); }),
+      field("ISF (mg/dL per 1U)", s.isf_mgdl_per_u, (v)=>{ s.isf_mgdl_per_u = clampInt(v, 10, 200); saveState(); render(); }),
+      field("ICR (grams per 1U)", s.icr_g_per_u, (v)=>{ s.icr_g_per_u = clampInt(v, 1, 50); saveState(); render(); }),
+    ]),
+    el("div", {class:"hr"}),
+    el("h2", {}, ["Low BG (glucose tablets)"]),
+    el("div", {class:"row"}, [
+      field("Tablet grams", s.glucose_tab_grams, (v)=>{ s.glucose_tab_grams = clampFloat(v, 1, 10); saveState(); render(); }),
+      field("Carb sensitivity (mg/dL per tablet)", s.carb_sensitivity_mgdl_per_tab, (v)=>{ s.carb_sensitivity_mgdl_per_tab = clampInt(v, 5, 40); saveState(); render(); }),
+      field("Hypo threshold (mg/dL)", s.hypo_threshold, (v)=>{ s.hypo_threshold = clampInt(v, 60, 80); saveState(); render(); }),
+      field("Urgent hypo (mg/dL)", s.urgent_hypo_threshold, (v)=>{ s.urgent_hypo_threshold = clampInt(v, 40, 60); saveState(); render(); }),
+    ]),
+    el("div", {class:"hr"}),
+    el("div", {class:"row"}, [
+      el("button", {class:"btn", onclick:()=>{ localStorage.removeItem(storageKey); state=loadState(); renderTabs(); render(); toast("Reset app data"); } }, ["Factory reset"]),
+      el("button", {class:"btn primary", onclick:()=>{ navigator.clipboard?.writeText(JSON.stringify(state,null,2)); toast("Copied state JSON"); } }, ["Copy state JSON"]),
+    ]),
+    el("div", {class:"muted small", style:"margin-top:8px"}, ["Version: ", el("span", {class:"mono"}, [V7.version])])
+  ]);
+
+  const info = el("div", {class:"card"}, [
+    el("h2", {}, ["Install on iPhone (Safari)"]),
+    el("div", {class:"muted small"}, ["Open this site in Safari → Share → Add to Home Screen. After first load it works offline."])
+  ]);
+
+  return el("div", {class:"row", style:"flex-direction:column; gap:10px;"}, [card, info]);
+}
+
+function render() {
+  renderTabs();
+  const host = $("#view");
+  host.innerHTML = "";
+  if (state.lastTab==="Calculator") host.appendChild(renderCalculator());
+  else if (state.lastTab==="Foods") host.appendChild(renderFoods());
+  else if (state.lastTab==="Templates") host.appendChild(renderTemplates());
+  else host.appendChild(renderSettings());
+}
 render();
-updateTotals();
-calc();
-</script>
 
-<script>
 if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("./sw.js");
+  window.addEventListener("load", ()=>{
+    navigator.serviceWorker.register("./sw.js").catch(()=>{});
+  });
 }
 </script>
-
 </body>
 </html>
