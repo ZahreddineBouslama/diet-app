@@ -1,4 +1,4 @@
-const CACHE = "bernstein-coach-v7-cache-v1";
+const CACHE = "bernstein-coach-v7-cache-v2";
 const ASSETS = ["./","./index.html","./manifest.json","./sw.js","./icons/icon-192.png","./icons/icon-512.png"];
 self.addEventListener("install", (event) => {
   event.waitUntil((async () => {
